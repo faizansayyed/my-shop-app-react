@@ -16,6 +16,7 @@ import {
 import storage from "redux-persist/es/storage";
 
 import cartReducer from "./cartSlice";
+import authReducer from "./authSlice";
 
 import {
   cartSyncMiddleware,
@@ -24,6 +25,7 @@ import {
 
 const rootReducer = combineReducers({
   cart: cartReducer,
+  auth: authReducer,
 });
 
 const persistConfig = {
