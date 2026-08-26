@@ -12,6 +12,11 @@ export default function ProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -38,6 +43,49 @@ export default function ProductsPage() {
   async function handleProductUpdated() {
     setEditingProduct(null);
     await fetchProducts();
+  }
+
+  function handleDeleteClick(product: Product) {
+    setDeleteError("");
+    setDeletingProduct(product);
+  }
+
+  function handleCloseDeleteModal() {
+    if (isDeleting) return;
+
+    setDeletingProduct(null);
+    setDeleteError("");
+  }
+
+  async function handleConfirmDelete() {
+    if (!deletingProduct) return;
+
+    try {
+      setIsDeleting(true);
+      setDeleteError("");
+
+      const response = await fetch(
+        `http://localhost:4000/api/products/${deletingProduct.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to delete product");
+      }
+
+      setDeletingProduct(null);
+      await fetchProducts();
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   async function fetchProducts() {
@@ -95,6 +143,7 @@ export default function ProductsPage() {
               product={product}
               onView={handleViewProduct}
               onEdit={handleEditProduct}
+              onDelete={handleDeleteClick}
             />
           ))}
         </div>
@@ -129,6 +178,47 @@ export default function ProductsPage() {
             onSuccess={handleProductUpdated}
             onCancel={handleCloseEditModal}
           />
+        )}
+      </Modal>
+
+      <Modal
+        title="Delete Product"
+        isOpen={deletingProduct !== null}
+        onClose={handleCloseDeleteModal}
+      >
+        {deletingProduct && (
+          <div className="delete-confirmation">
+            <p>
+              Are you sure you want to delete{" "}
+              <strong>{deletingProduct.title}</strong>?
+            </p>
+
+            <p className="delete-confirmation__warning">
+              This action cannot be undone.
+            </p>
+
+            {deleteError && <p className="error-message">{deleteError}</p>}
+
+            <div className="delete-confirmation__actions">
+              <button
+                type="button"
+                className="button button--secondary"
+                onClick={handleCloseDeleteModal}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="button button--danger"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Product"}
+              </button>
+            </div>
+          </div>
         )}
       </Modal>
     </section>

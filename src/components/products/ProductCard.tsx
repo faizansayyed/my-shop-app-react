@@ -1,16 +1,27 @@
 import type { Product } from "../../types/product";
 
+import { useAppDispatch } from "../../store/hooks";
+import { addToCart } from "../../store/cartSlice";
+
 type ProductCardProps = {
   product: Product;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
 };
 
 export default function ProductCard({
   product,
   onView,
   onEdit,
+  onDelete,
 }: ProductCardProps) {
+  const dispatch = useAppDispatch();
+
+  function handleAddToCart() {
+    dispatch(addToCart(product));
+  }
+
   return (
     <article className="product-card">
       {product.image}
@@ -24,12 +35,20 @@ export default function ProductCard({
 
         <div className="product-card__info">
           <strong>${product.price.toFixed(2)}</strong>
-          <span>{product.stock} in stock</span>
+
+          <span>
+            {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+          </span>
         </div>
 
         <div className="product-card__actions">
-          <button type="button" className="button button--primary">
-            Add to Cart
+          <button
+            type="button"
+            className="button button--primary"
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+          >
+            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
           </button>
 
           <button
@@ -48,7 +67,12 @@ export default function ProductCard({
             Edit
           </button>
 
-          <button type="button" className="button button--danger">
+          <button
+            type="button"
+            className="button button--danger"
+            onClick={() => onDelete(product)}
+            aria-label={`Delete ${product.title}`}
+          >
             Delete
           </button>
         </div>
