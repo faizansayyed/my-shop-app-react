@@ -2,9 +2,10 @@ import type { Product } from "../../types/product";
 
 type ProductCardProps = {
   product: Product;
+  onView: (product: Product) => void;
 };
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, onView }: ProductCardProps) {
   return (
     <article className="product-card">
       {product.image}
@@ -26,7 +27,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             Add to Cart
           </button>
 
-          <button type="button" className="button button--secondary">
+          <button
+            type="button"
+            className="button button--secondary"
+            onClick={() => onView(product )}
+          >
             View
           </button>
 

@@ -3,11 +3,13 @@ import type { Product, ProductsResponse } from "../types/product";
 import ProductCard from "../components/products/ProductCard";
 import Modal from "../components/common/Modal";
 import ProductForm from "../components/products/ProductForm";
+import ProductDetails from "../components/products/ProductDetails";
 
 export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -15,6 +17,14 @@ export default function ProductsPage() {
     setIsModalOpen(false);
     fetchProducts();
   }, []);
+
+  function handleViewProduct(product: Product) {
+    setSelectedProduct(product);
+  }
+
+  function handleCloseViewModal() {
+    setSelectedProduct(null);
+  }
 
   async function fetchProducts() {
     try {
@@ -66,7 +76,11 @@ export default function ProductsPage() {
       ) : (
         <div className="products-grid">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              onView={handleViewProduct}
+            />
           ))}
         </div>
       )}
@@ -80,6 +94,14 @@ export default function ProductsPage() {
           onSuccess={handleProductAdded}
           onCancel={() => setIsModalOpen(false)}
         />
+      </Modal>
+
+      <Modal
+        title="Product Details"
+        isOpen={selectedProduct !== null}
+        onClose={handleCloseViewModal}
+      >
+        {selectedProduct && <ProductDetails product={selectedProduct} />}
       </Modal>
     </section>
   );
