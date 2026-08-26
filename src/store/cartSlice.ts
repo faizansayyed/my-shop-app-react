@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Product } from "../types/product";
+import { logout, sessionCleared } from "./authSlice";
 
 export type CartItem = Product & {
   quantity: number;
@@ -71,6 +72,15 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(logout.fulfilled, (state) => {
+        state.items = [];
+      })
+      .addCase(sessionCleared, (state) => {
+        state.items = [];
+      });
   },
 });
 

@@ -67,6 +67,15 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.error = "";
     },
+
+    // Used when another tab logs out.
+    // No API call here - that tab already cleared the cookie.
+    sessionCleared: (state) => {
+      state.user = null;
+      state.status = "guest";
+      state.error = "";
+      state.isSubmitting = false;
+    },
   },
 
   extraReducers: (builder) => {
@@ -105,6 +114,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError } = authSlice.actions;
+export const { clearAuthError, sessionCleared } = authSlice.actions;
 
 export default authSlice.reducer;

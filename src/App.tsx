@@ -14,6 +14,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { useAppDispatch } from "./store/hooks";
 import { fetchCurrentUser } from "./store/authSlice";
 import LoginPage from "./pages/LoginPage";
+import { useSessionRevalidation } from "./hooks/useSessionRevalidation";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -21,6 +22,8 @@ function App() {
   useEffect(() => {
     dispatch(fetchCurrentUser());
   }, [dispatch]);
+
+  useSessionRevalidation();
 
   return (
     <AppShell>

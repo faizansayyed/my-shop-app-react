@@ -23,6 +23,11 @@ import {
   subscribeToCartChanges,
 } from "./cartSyncMiddleware";
 
+import {
+  authSyncMiddleware,
+  subscribeToAuthEvents,
+} from "./authSyncMiddleware";
+
 const rootReducer = combineReducers({
   cart: cartReducer,
   auth: authReducer,
@@ -46,12 +51,13 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(cartSyncMiddleware),
+    }).concat(cartSyncMiddleware, authSyncMiddleware),
 });
 
 export const persistor = persistStore(store);
 
 subscribeToCartChanges(store.dispatch);
+subscribeToAuthEvents(store.dispatch);
 
 export type RootState = ReturnType<typeof store.getState>;
 
