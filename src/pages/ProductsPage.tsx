@@ -10,6 +10,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -24,6 +25,19 @@ export default function ProductsPage() {
 
   function handleCloseViewModal() {
     setSelectedProduct(null);
+  }
+
+  function handleEditProduct(product: Product) {
+    setEditingProduct(product);
+  }
+
+  function handleCloseEditModal() {
+    setEditingProduct(null);
+  }
+
+  async function handleProductUpdated() {
+    setEditingProduct(null);
+    await fetchProducts();
   }
 
   async function fetchProducts() {
@@ -80,6 +94,7 @@ export default function ProductsPage() {
               key={product.id}
               product={product}
               onView={handleViewProduct}
+              onEdit={handleEditProduct}
             />
           ))}
         </div>
@@ -102,6 +117,19 @@ export default function ProductsPage() {
         onClose={handleCloseViewModal}
       >
         {selectedProduct && <ProductDetails product={selectedProduct} />}
+      </Modal>
+      <Modal
+        title="Edit Product"
+        isOpen={editingProduct !== null}
+        onClose={handleCloseEditModal}
+      >
+        {editingProduct && (
+          <ProductForm
+            product={editingProduct}
+            onSuccess={handleProductUpdated}
+            onCancel={handleCloseEditModal}
+          />
+        )}
       </Modal>
     </section>
   );

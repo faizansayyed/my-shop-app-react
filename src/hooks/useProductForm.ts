@@ -1,8 +1,7 @@
 import { useReducer } from "react";
-import type { FormEvent } from "react";
-import type { ProductInput } from "../types/product";
+import type { Product, ProductInput } from "../types/product";
 
-const initialForm: ProductInput = {
+const emptyForm: ProductInput = {
   title: "",
   description: "",
   price: 0,
@@ -17,32 +16,30 @@ type FormState = {
   error: string;
 };
 
-const initialState: FormState = {
-  form: initialForm,
-  isSubmitting: false,
-  error: "",
-};
-
-type UseProductFormProps = {
-  onSuccess: () => void;
-};
-
-type UseProductFormReturn = {
-  form: ProductInput;
-  isSubmitting: boolean;
-  error: string;
-  updateField: (field: keyof ProductInput, value: string | number) => void;
-  submitForm: (event: SubmitEvent) => void; // or Promise<void> if they want to await
-};
-
 type FormAction =
   | { type: "UPDATE_FIELD"; field: keyof ProductInput; value: string | number }
   | { type: "SUBMIT_START" }
   | { type: "SUBMIT_END" }
-  | { type: "SET_ERROR"; message: string }
-  | { type: "RESET" };
+  | { type: "SET_ERROR"; message: string };
 
-function formReducer(state: FormState, action: FormAction) {
+function getInitialState(product?: Product): FormState {
+  return {
+    form: product
+      ? {
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          category: product.category,
+          stock: product.stock,
+          image: product.image,
+        }
+      : emptyForm,
+    isSubmitting: false,
+    error: "",
+  };
+}
+
+function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
     case "UPDATE_FIELD":
       return {
@@ -55,17 +52,20 @@ function formReducer(state: FormState, action: FormAction) {
       return { ...state, isSubmitting: false };
     case "SET_ERROR":
       return { ...state, error: action.message };
-    case "RESET":
-      return initialState;
     default:
       return state;
   }
 }
 
-export function useProductForm({
-  onSuccess,
-}: UseProductFormProps): UseProductFormReturn {
-  const [state, dispatch] = useReducer(formReducer, initialState);
+type UseProductFormOptions = {
+  product?: Product;
+  onSuccess: () => void;
+};
+
+export function useProductForm({ product, onSuccess }: UseProductFormOptions) {
+  const [state, dispatch] = useReducer(formReducer, product, getInitialState);
+
+  const isEditMode = Boolean(product);
 
   function updateField(field: keyof ProductInput, value: string | number) {
     dispatch({ type: "UPDATE_FIELD", field, value });
@@ -73,12 +73,15 @@ export function useProductForm({
 
   async function submitForm(event: SubmitEvent) {
     event.preventDefault();
-
     dispatch({ type: "SUBMIT_START" });
 
+    const url = isEditMode
+      ? `http://localhost:4000/api/products/${product?.id}`
+      : "http://localhost:4000/api/products";
+
     try {
-      const response = await fetch("http://localhost:4000/api/products", {
-        method: "POST",
+      const response = await fetch(url, {
+        method: isEditMode ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(state.form),
       });
@@ -86,10 +89,12 @@ export function useProductForm({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to add product");
+        throw new Error(
+          result.message ||
+            `Failed to ${isEditMode ? "update" : "add"} product`,
+        );
       }
 
-      dispatch({ type: "RESET" });
       onSuccess();
     } catch (error) {
       dispatch({
@@ -106,6 +111,7 @@ export function useProductForm({
     form: state.form,
     isSubmitting: state.isSubmitting,
     error: state.error,
+    isEditMode,
     updateField,
     submitForm,
   };

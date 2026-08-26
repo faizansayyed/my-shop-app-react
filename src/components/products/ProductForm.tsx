@@ -1,14 +1,19 @@
+import type { Product } from "../../types/product";
 import { useProductForm } from "../../hooks/useProductForm";
 
 type ProductFormProps = {
+  product?: Product;
   onSuccess: () => void;
   onCancel: () => void;
 };
 
-export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
-  const { form, isSubmitting, error, updateField, submitForm } = useProductForm(
-    { onSuccess },
-  );
+export default function ProductForm({
+  product,
+  onSuccess,
+  onCancel,
+}: ProductFormProps) {
+  const { form, isSubmitting, error, isEditMode, updateField, submitForm } =
+    useProductForm({ product, onSuccess });
 
   return (
     <form
@@ -22,7 +27,7 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
         <input
           required
           value={form.title}
-          onChange={(event) => updateField("title", event.target.value)}
+          onChange={(e) => updateField("title", e.target.value)}
         />
       </label>
 
@@ -32,7 +37,7 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
           required
           rows={4}
           value={form.description}
-          onChange={(event) => updateField("description", event.target.value)}
+          onChange={(e) => updateField("description", e.target.value)}
         />
       </label>
 
@@ -45,9 +50,7 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
             step="0.01"
             type="number"
             value={form.price}
-            onChange={(event) =>
-              updateField("price", Number(event.target.value))
-            }
+            onChange={(e) => updateField("price", Number(e.target.value))}
           />
         </label>
 
@@ -59,9 +62,7 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
             step="1"
             type="number"
             value={form.stock}
-            onChange={(event) =>
-              updateField("stock", Number(event.target.value))
-            }
+            onChange={(e) => updateField("stock", Number(e.target.value))}
           />
         </label>
       </div>
@@ -71,7 +72,7 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
         <input
           required
           value={form.category}
-          onChange={(event) => updateField("category", event.target.value)}
+          onChange={(e) => updateField("category", e.target.value)}
         />
       </label>
 
@@ -79,9 +80,8 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
         Image URL
         <input
           type="url"
-          placeholder="https://example.com/product.jpg"
           value={form.image}
-          onChange={(event) => updateField("image", event.target.value)}
+          onChange={(e) => updateField("image", e.target.value)}
         />
       </label>
 
@@ -100,7 +100,13 @@ export default function ProductForm({ onSuccess, onCancel }: ProductFormProps) {
           className="button button--primary"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Adding..." : "Add Product"}
+          {isSubmitting
+            ? isEditMode
+              ? "Updating..."
+              : "Adding..."
+            : isEditMode
+              ? "Update Product"
+              : "Add Product"}
         </button>
       </div>
     </form>
