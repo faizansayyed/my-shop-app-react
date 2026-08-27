@@ -15,6 +15,7 @@ import { useAppDispatch } from "./store/hooks";
 import { fetchCurrentUser } from "./store/authSlice";
 import LoginPage from "./pages/LoginPage";
 import { useSessionRevalidation } from "./hooks/useSessionRevalidation";
+import { ProductSearch } from "./pages/ProductSearch";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -40,6 +41,10 @@ function App() {
         {/* Logged in only */}
         <Route element={<ProtectedRoute requireAdmin={false} />}>
           <Route path="/products" element={<ProductsPage />} />
+        </Route>
+
+        <Route element={<ProtectedRoute requireAdmin={false} />}>
+          <Route path="/products-search" element={<ProductSearch />} />
         </Route>
 
         {/* Admin only - for later pages like /products/new */}

@@ -13,6 +13,9 @@ export default function Sidebar() {
           <li>
             <NavLink to="/products">Products</NavLink>
           </li>
+          <li>
+            <NavLink to="/products-search">Products Search</NavLink>
+          </li>
         </ul>
       </nav>
     </aside>
