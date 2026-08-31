@@ -24,7 +24,17 @@ export default function ProductCard({
 
   return (
     <article className="product-card">
-      {product.image}
+      <img
+        className="product-card__image"
+        src={product.image}
+        alt={product.title}
+        style={{
+          width: "100%",
+          height: "180px",
+          display: "block",
+          objectFit: "cover",
+        }}
+      />
 
       <div className="product-card__content">
         <span className="product-card__category">{product.category}</span>

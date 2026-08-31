@@ -13,8 +13,8 @@ import {
 import type { LoginInput } from "../types/auth";
 
 const emptyForm: LoginInput = {
-  email: "",
-  password: "",
+  email: "admin@minishop.com",
+  password: "Password@123",
 };
 
 export default function LoginPage() {

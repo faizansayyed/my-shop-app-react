@@ -15,7 +15,7 @@ import { useAppDispatch } from "./store/hooks";
 import { fetchCurrentUser } from "./store/authSlice";
 import LoginPage from "./pages/LoginPage";
 import { useSessionRevalidation } from "./hooks/useSessionRevalidation";
-import { ProductSearch } from "./pages/ProductSearch";
+import { ProductSearch } from "./pages/ProdcutSearch/ProductSearch";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -24,7 +24,7 @@ function App() {
     dispatch(fetchCurrentUser());
   }, [dispatch]);
 
-  useSessionRevalidation();
+  // useSessionRevalidation();
 
   return (
     <AppShell>
